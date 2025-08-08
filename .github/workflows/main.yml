@@ -19,7 +19,6 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      # Sửa lỗi setup Android SDK bằng cách dùng v2
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
         with:
@@ -40,8 +39,12 @@ jobs:
           ls -la
           ls -la app || true
 
-      - name: Grant Gradle wrapper permission
-        run: chmod +x ./gradlew
+      - name: Generate Gradle wrapper if missing
+        run: |
+          if [ ! -f "./gradlew" ]; then
+            gradle wrapper
+          fi
+          chmod +x ./gradlew
 
       - name: Build debug APK
         run: ./gradlew --no-daemon assembleDebug
