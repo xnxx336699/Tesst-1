@@ -1,9 +1,9 @@
 name: Build APK from ZIP (TFTOverlay V3)
 
 on:
-  workflow_dispatch:       # Cho phép chạy thủ công
+  workflow_dispatch:
   push:
-    branches: [ main ]     # Commit vào main sẽ tự build
+    branches: [ main ]
 
 jobs:
   build:
@@ -19,17 +19,22 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      # Cài Android SDK + license + các gói cần thiết
+      # Cài SDK + gói cần thiết và CHẤP NHẬN LICENSE
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
+          cmdline-tools-version: 16.0
           accept-android-sdk-licenses: true
+          log-accepted-android-sdk-licenses: true
           packages: |
             build-tools;34.0.0
             platforms;android-34
             platform-tools
 
-      # Giải nén project từ file ZIP ở root repo
+      - name: Accept all SDK licenses (force)
+        run: yes | sdkmanager --licenses
+
+      # Giải nén source từ ZIP ở root
       - name: Unzip project
         run: |
           unzip -q TFTOverlay_V3_Blitz.zip -d src
@@ -40,11 +45,9 @@ jobs:
       - name: Grant Gradle wrapper permission
         run: chmod +x ./gradlew
 
-      # Build nhanh bản debug (chưa ký). Muốn release thì đổi assembleDebug -> assembleRelease
       - name: Build debug APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew --no-daemon assembleDebug
 
-      # Tải APK ở mục Artifacts
       - name: Upload APK (debug)
         uses: actions/upload-artifact@v4
         with:
