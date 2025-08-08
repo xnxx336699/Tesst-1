@@ -42,3 +42,8 @@ jobs:
         with:
           name: TFTOverlay-unsigned-APK
           path: app/build/outputs/apk/release/app-release-unsigned.apk
+- name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: TFTOverlay-unsigned-APK
+        path: app/build/outputs/apk/debug/app-debug.apk
